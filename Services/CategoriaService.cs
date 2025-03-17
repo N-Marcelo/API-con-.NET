@@ -10,32 +10,34 @@ public class CategoriaService : ICategoriaService
         context = dbcontext;
     }
 
+    //RELOAD
     public IEnumerable<Categoria> GetCategorias()
     {
         return context.Categorias;
     }
 
-    public async Task Save(Categoria categoria)
+    //CREATE
+    public async Task SaveCategoria(Categoria categoria)
     {
         context.Add(categoria);
         await context.SaveChangesAsync();
     }
-
-    public async Task Update(Guid id, Categoria categoria)
+    //UPDATE
+    public async Task UpdateCategoria(Guid id, Categoria categoria)
     {
         var categoriaActual = context.Categorias.Find(id);
         if(categoriaActual != null)
         {
-            categoriaActual.Nombre = categoria.Nombre;
-            categoria.Descripcion = categoria.Descripcion;
-            categoria.Peso = categoria.Peso;
+            categoriaActual.NombreCategoria = categoria.NombreCategoria;
+            categoriaActual.DescripcionCategoria = categoria.DescripcionCategoria;
+            categoriaActual.PesoCategoria = categoria.PesoCategoria;
 
             await context.SaveChangesAsync();
         }
     }
 
-    
-    public async Task Delete(Guid id)
+    //DELETE
+    public async Task DeleteCategoria(Guid id)
     {
         var categoriaActual = context.Categorias.Find(id);
 
@@ -50,8 +52,8 @@ public class CategoriaService : ICategoriaService
 public interface ICategoriaService
 {
     IEnumerable<Categoria> GetCategorias();
-    Task Save(Categoria categoria);
-    Task Update(Guid id, Categoria categoria);
-    Task Delete(Guid id);
+    Task SaveCategoria(Categoria categoria);
+    Task UpdateCategoria(Guid id, Categoria categoria);
+    Task DeleteCategoria(Guid id);
 
 }

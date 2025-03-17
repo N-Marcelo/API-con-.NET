@@ -15,7 +15,7 @@ public class CategoriaController: ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public IActionResult GetCategoria()
     {
         return Ok(categoriaService.GetCategorias());
     }
@@ -23,21 +23,21 @@ public class CategoriaController: ControllerBase
     [HttpPost]
     public IActionResult Post([FromBody] Categoria categoria)
     {
-        categoriaService.Save(categoria);
+        categoriaService.SaveCategoria(categoria);
         return Ok();
     }
 
     [HttpPut("{id}")]
     public IActionResult Put(Guid id, [FromBody] Categoria categoria)
     {
-        categoriaService.Update(id, categoria);
+        categoriaService.UpdateCategoria(id, categoria);
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(Guid id)
     {
-        categoriaService.Delete(id);
+        categoriaService.DeleteCategoria(id);
         return Ok();
     }
 }

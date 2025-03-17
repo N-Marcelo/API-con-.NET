@@ -11,14 +11,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSqlServer<TareasContext>("Data Source=DESKTOP-MGKBR16\\DESARROLLO;Initial Catalog=TareasDBTest;User ID=sa;Password=sa;TrustServerCertificate=True;");
-builder.Services.AddScoped<IHelloWorldService, HelloworldService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<ITareasService, TareasService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())<
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
