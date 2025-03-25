@@ -16,7 +16,7 @@ public class Tarea
 
 public enum Prioridad
 {
-    Baja,
-    Media,
-    Alta
+    Baja = 0,
+    Media = 1,
+    Alta = 2
 }

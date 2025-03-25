@@ -1,35 +1,42 @@
+using Microsoft.EntityFrameworkCore;
 using webapi;
 using webapi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Registrar el contexto de la base de datos
+builder.Services.AddDbContext<TareasContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging() // Habilita logs detallados
+           .LogTo(Console.WriteLine, LogLevel.Debug)); // Muestra los logs en la consola
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddSqlServer<TareasContext>("Data Source=DESKTOP-MGKBR16\\DESARROLLO;Initial Catalog=TareasDBTest;User ID=sa;Password=sa;TrustServerCertificate=True;");
+// Registrar los servicios
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<ITareasService, TareasService>();
 
+// Configurar Swagger
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configurar el pipeline de la aplicación
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    //app.MapOpenApi();
 }
 
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
+
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-//app.UseTimeMiddleware();
-
 app.MapControllers();
 
 app.Run();

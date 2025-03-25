@@ -1,4 +1,6 @@
+using System.Text.Json;
 using System.Threading.Tasks;
+using API_con_.NET.Models;
 using Microsoft.AspNetCore.Mvc;
 using webapi.Models;
 using webapi.Services;
@@ -6,6 +8,7 @@ using webapi.Services;
 namespace webapi.Controllers;
 
 [Route("api/[controller]")]
+[ApiController]
 public class TareaController : ControllerBase
 {
     ITareasService tareasService;
@@ -23,23 +26,76 @@ public class TareaController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult PostTarea([FromBody] Tarea tarea)
+    public async Task<IActionResult> PostTarea([FromBody] Tarea tarea)
     {
-        tareasService.SaveTarea(tarea);
-        return Ok();
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await tareasService.SaveTarea(tarea);
+            return Ok("Tarea creada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al guardar la tarea: {ex.Message}");
+        }
     }
 
     [HttpPut("{id}")]
-    public IActionResult PutTarea(Guid id, [FromBody] Tarea tarea)
+    public async Task<IActionResult> PutTarea(Guid id, [FromBody] TareaUpdateRequest request)
     {
-        tareasService.UpdateTarea(id, tarea);
-        return Ok();
+        try
+        {
+            if (id != request.TareaId)
+            {
+                return BadRequest("El ID de la tarea no coincide.");
+            }
+
+            // Crear un objeto Tarea a partir de la solicitud
+            var tarea = new Tarea
+            {
+                TareaId = request.TareaId,
+                NombreTarea = request.NombreTarea,
+                DescripcionTarea = request.DescripcionTarea,
+                PrioridadTarea = request.PrioridadTarea,
+                CategoriaId = request.CategoriaId
+            };
+
+            // Llamar al servicio para actualizar la tarea
+            var resultado = await tareasService.UpdateTarea(id, tarea, request.NuevoNombreCategoria);
+
+            // Si la actualización falla, devolver un error
+            if (!resultado)
+            {
+                return BadRequest("No se pudo actualizar la tarea o la categoría.");
+            }
+
+            // Si todo sale bien, devolver una respuesta exitosa
+            return Ok("Tarea actualizada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            // Manejar cualquier excepción inesperada
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+        }
     }
 
+
+
     [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        tareasService.DeleteTarea(id);
-        return Ok();
+        try
+        {
+            await tareasService.DeleteTarea(id);
+            return Ok("Tarea eliminada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al eliminar la tarea: {ex.Message}");
+        }
     }
 }

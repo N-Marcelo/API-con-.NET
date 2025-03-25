@@ -14,6 +14,13 @@ public class CategoriaController: ControllerBase
         categoriaService = service;
     }
 
+    [HttpGet("categorias-simplificadas")]
+    public IActionResult GetCategoriasSimplificadas()
+    {
+        var categorias = categoriaService.GetCategoriasSimplificadas();
+        return Ok(categorias);
+    }
+
     [HttpGet]
     public IActionResult GetCategoria()
     {
@@ -21,23 +28,53 @@ public class CategoriaController: ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Post([FromBody] Categoria categoria)
+    public async Task<IActionResult> PostCategoria([FromBody] Categoria categoria)
     {
-        categoriaService.SaveCategoria(categoria);
-        return Ok();
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            await categoriaService.SaveCategoria(categoria);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al guardar la categorial: {ex.Message}");
+        }
     }
-
     [HttpPut("{id}")]
-    public IActionResult Put(Guid id, [FromBody] Categoria categoria)
+    public async Task<IActionResult> PutCategoria(Guid id, [FromBody] Categoria categoria)
     {
-        categoriaService.UpdateCategoria(id, categoria);
-        return Ok();
-    }
+        try
+        {
+            if (id != categoria.CategoriaId)
+            {
+                return BadRequest("El ID de la categoria no coincide.");
+            }
 
+            await categoriaService.UpdateCategoria(id, categoria);
+
+            return Ok("Categoria actualizada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Erro interno del servidor: {ex.Message}");
+        }
+ 
+    }
     [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> DeleteCategoria(Guid id)
     {
-        categoriaService.DeleteCategoria(id);
-        return Ok();
+        try
+        {
+            await categoriaService.DeleteCategoria(id);
+            return Ok("Categoria eliminada correctamente.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error al eliminar la categoria: {ex.Message}");
+        }
     }
 }
